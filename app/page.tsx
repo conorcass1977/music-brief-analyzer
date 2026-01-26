@@ -66,7 +66,13 @@ Return ONLY the JSON object, no other text.`
       const data = await response.json();
       
       if (data.error) {
+        console.error('API Error:', data.error);
         throw new Error(data.error);
+      }
+      
+      if (!data.content || !data.content[0] || !data.content[0].text) {
+        console.error('Unexpected API response:', data);
+        throw new Error('Invalid response from API');
       }
       
       const content = data.content[0].text;
@@ -77,7 +83,8 @@ Return ONLY the JSON object, no other text.`
       setStep('analysis');
     } catch (error) {
       console.error('Analysis error:', error);
-      alert('Error analyzing brief. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Error analyzing brief: ${errorMessage}\n\nPlease try with a shorter brief or simpler language.`);
       setStep('input');
     }
   };
@@ -156,7 +163,13 @@ Write the brief in a professional, clear tone. Be specific but not restrictive. 
       const data = await response.json();
       
       if (data.error) {
+        console.error('API Error:', data.error);
         throw new Error(data.error);
+      }
+      
+      if (!data.content || !data.content[0] || !data.content[0].text) {
+        console.error('Unexpected API response:', data);
+        throw new Error('Invalid response from API');
       }
       
       const brief = data.content[0].text;
@@ -164,7 +177,10 @@ Write the brief in a professional, clear tone. Be specific but not restrictive. 
       setStep('output');
     } catch (error) {
       console.error('Generation error:', error);
-      alert('Error generating brief. Please try again.');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Error generating brief: ${errorMessage}\n\nPlease try with shorter answers.`);
+      setStep('questions');
+      setCurrentQuestion(analysis.questions.length - 1); // Go back to last question
     }
   };
 
